@@ -41,7 +41,7 @@ class UserSerializer(ModelSerializer):
 class ReadProjectSerializer(ModelSerializer):
 
     members = ReadUserSerializer(many=True)
-    manager_id = ReadUserSerializer()
+    manager = ReadUserSerializer()
 
     class Meta:
         model = Project
@@ -76,7 +76,7 @@ class ReadBuildingSerializer(ModelSerializer):
 
     class Meta:
         model = Building
-        fields =  ['id','name','description','project_id','building_detail_ids']
+        fields =  ['id','name','description','project','building_detail_ids']
 
 class WriteBuildingSerializer(ModelSerializer):
     class Meta:
@@ -129,10 +129,10 @@ class CheckingWaySerializer(ModelSerializer):
 # Step
 
 class ReadProcessStepSerializer(ModelSerializer):
-    checking_way_id = CheckingWaySerializer()
+    checking_way = CheckingWaySerializer()
     class Meta:
         model = ProcessStep
-        fields = ['id','name','checking_way_id']
+        fields = ['id','name','checking_way']
 
 
 class WriteProcessStepSerializer(ModelSerializer):
@@ -158,27 +158,46 @@ class WriteProcessSectionSerializer(ModelSerializer):
 
 # Device Document
 
-class DeviceDocumentSerializer(ModelSerializer):
+class ReadDeviceDocumentSerializer(ModelSerializer):
+    path = SerializerMethodField()
+
+    def get_path(self, device_document):
+        request = self.context['request']
+        filename = device_document.path.name
+        if filename.startswith("static/"):
+            path = '/%s' % filename
+        else:
+            path = '/static/%s' % filename
+        return request.build_absolute_uri(path)
+
     class Meta:
         model = DeviceDocument
-        fields = ['id', 'name', 'path', 'process_id']
+        fields = ['id', 'name', 'path', 'process']
+
+class WriteDeviceDocumentSerializer(ModelSerializer):
+
+    class Meta:
+        model = DeviceDocument
+        fields = '__all__'
+
+
 
 # Maintenance Task Document
 
 class MaintenanceTaskDocumentSerializer(ModelSerializer):
     class Meta:
         model = MaintenanceTaskDocument
-        fields = ['id', 'name', 'path', 'maintenance_task_document_id']
+        fields = ['id', 'name', 'path', 'maintenance_task_document']
 
 # Device 
 
 class ReadDeviceSerializer(ModelSerializer):
-    device_document_ids = DeviceDocumentSerializer(many=True)
-    process_id = ProcessSerializer()
+    device_document_ids = ReadDeviceDocumentSerializer(many=True)
+    process = ProcessSerializer()
 
     class Meta:
         model = Device
-        fields = ['id','name','model','code','project_id','device_document_ids','process_id']
+        fields = ['id','name','model','code','project','device_document_ids','process']
 
 
 class WriteDeviceSerializer(ModelSerializer):
@@ -191,13 +210,13 @@ class WriteDeviceSerializer(ModelSerializer):
 
 class ReadMaintenanceDeviceSerializer(ModelSerializer):
     members = ReadUserSerializer(many=True)
-    device_name = serializers.CharField(source="device_id.name")
-    section_name = serializers.CharField(source="section_id.name")
+    device_name = serializers.CharField(source="device.name")
+    section_name = serializers.CharField(source="section.name")
 
 
     class Meta:
         model = MaintenanceDevice
-        fields = ["id","name","description","starting_date","ending_date","device_id","device_name","maintenance_area_detail_id","section_id","section_name","members"]
+        fields = ["id","name","description","starting_date","ending_date","device","device_name","maintenance_area_detail","section","section_name","members"]
 
 
 class WriteMaintenanceDeviceSerializer(ModelSerializer):
@@ -208,11 +227,11 @@ class WriteMaintenanceDeviceSerializer(ModelSerializer):
 # maintenance task
 
 class ReadMaintenanceTaskSerializer(ModelSerializer):
-    employee_id = ReadUserSerializer()
+    employee = ReadUserSerializer()
     maintenance_task_document_ids = MaintenanceTaskDocumentSerializer(many=True)
     class Meta:
         model = MaintenanceTask
-        fields = ["id","name","sequence","maintenance_device_id","is_qualified","note","employee_id","maintenance_task_document_ids"]
+        fields = ["id","name","sequence","maintenance_device","is_qualified","note","employee","maintenance_task_document_ids"]
 
 class WriteMaintenanceTaskSerializer(ModelSerializer):
     class Meta:
