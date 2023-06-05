@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions, status, generics
+from .permissions import ( IsUserManager )
 from .serializers import ( ReadDeviceDocumentSerializer, WriteDeviceDocumentSerializer, MaintenanceTaskDocumentSerializer, ReadMaintenanceAreaDetailSerializer, ReadMaintenanceDeviceSerializer, ReadMaintenanceTaskSerializer, ReadProcessStepSerializer, WriteMaintenanceAreaDetailSerializer, ReadMaintenanceAreaSerializer, 
                           WriteMaintenanceAreaSerializer, ReadBuildingDetailSerializer, ReadBuildingSerializer, UserSerializer, ReadProjectSerializer, 
                           WriteBuildingSerializer, WriteMaintenanceDeviceSerializer, WriteMaintenanceTaskSerializer, WriteProcessStepSerializer, WriteProjectSerializer, WriteBuildingDetailSerializer, ProcessSerializer, CheckingWaySerializer, 
@@ -12,6 +13,7 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.auth import AuthToken
 from .paginator import LargeResultsSetPagination, StandardResultsSetPagination
 from datetime import datetime
+
 
 
 
@@ -35,8 +37,8 @@ def login_api(request):
             'username': user.username,
             'email': user.email,
             'device_token': user.device_token,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
+            'name': user.name,
+            'is_manager': user.is_manager,
             'is_superuser': user.is_superuser,
         },
         'token': token
@@ -62,9 +64,7 @@ class UserViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView
     parser_classes = [MultiPartParser]
     permission_classes = [permissions.IsAuthenticated]
 
-    @action(methods=['get'], detail=False, url_path='current-user')
-    def get_current_user(seft, request):
-        return Response(seft.serializer_class(request.user).data, status=status.HTTP_200_OK)
+
 
     def list(self, request):
         users = User.objects.filter(is_active=True)
@@ -96,7 +96,7 @@ class UserViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView
 
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.filter(active=True)
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsUserManager]
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update', 'destroy'):
@@ -107,9 +107,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=True, url_path='get_building_by_project')
     def get_building_by_project(self, request, pk):
         buildings= self.get_object().building_ids.filter(active=True)
-
+        
         serializer = ReadBuildingSerializer(buildings, many=True)
         return Response(data={"buildings": serializer.data}, status=status.HTTP_200_OK)
+  
+    
     
 
 class BuildingViewSet(viewsets.ModelViewSet):

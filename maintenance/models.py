@@ -6,9 +6,13 @@ from rest_framework import serializers
 
 
 class User(AbstractUser):
+    first_name = None
+    last_name = None
+
 
     name = models.CharField(max_length=150, null=False)
     device_token = models.CharField(max_length=50, null=True)
+    is_manager = models.BooleanField(default=True)
 
 
 class ItemBase(models.Model):
@@ -38,10 +42,10 @@ class Project(ItemBase):
 
     code = models.CharField(max_length=50)
     state = models.PositiveSmallIntegerField(choices=STATE, default=Draft)
-    starting_date = models.DateTimeField(null=False)
-    ending_date = models.DateTimeField(null=False)
+    starting_date = models.DateTimeField(null=True)
+    ending_date = models.DateTimeField(null=True)
     manager = models.ForeignKey(
-        User, related_name="project_ids", null=False, on_delete=models.CASCADE)
+        User, related_name="project_ids", null=True, on_delete=models.CASCADE)
     members = models.ManyToManyField(User, related_name="project_user_rel")
 
 class Building(ItemBase):
@@ -130,6 +134,7 @@ class Device(ItemBase):
 
     model = models.CharField(max_length=50)
     code = models.CharField(max_length=50)
+    state = models.PositiveSmallIntegerField(choices=STATE, default=Stock)
     project = models.ForeignKey(Project, related_name="device_ids",null=False,on_delete=models.CASCADE)
     process = models.ForeignKey(Process, related_name="process_ids",null=True,on_delete=models.SET_NULL) #warning related_name
 

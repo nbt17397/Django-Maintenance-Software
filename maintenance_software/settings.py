@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'import_export',
     'knox',
-    "drf_standardized_errors",
+    'drf_standardized_errors',
+    'rest_framework_swagger',
 ]
 
 MIDDLEWARE = [
