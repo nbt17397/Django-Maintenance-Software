@@ -213,17 +213,21 @@ class ProcessSectionViewSet(viewsets.ModelViewSet):
         serializer = ReadProcessStepSerializer(steps, many=True)
         return Response(data={"steps": serializer.data}, status=status.HTTP_200_OK)
     
-    @action(methods=['get','post'], detail=True, url_path='generate-maintenance-tasks')
+    @action(methods=['post'], detail=True, url_path='generate-maintenance-tasks')
     def generate_maintenance_tasks(self, request, pk):
         try:
             steps = self.get_object().step_ids.filter(active=True)
 
-            if steps.exists():
-                [MaintenanceTask.objects.create(name=step.name, sequence=step.sequence, maintenance_device_id=1, step=step, checking_way=step.checking_way) for step in steps]
+            maintenance_device_id = request.data.get('maintenance_device_id')
 
-            return Response(data={"result": "Generated steps successfully"}, status=status.HTTP_200_OK)
-        except:
-            return Response(data={"result": "An exception occurred"}, status=status.HTTP_400_BAD_REQUEST)
+            if steps.exists() and maintenance_device_id:
+                [MaintenanceTask.objects.create(name=step.name, sequence=step.sequence, maintenance_device_id=maintenance_device_id, step=step, checking_way=step.checking_way) for step in steps]
+                return Response(data={"result": "Generated steps successfully"}, status=status.HTTP_200_OK)
+            else:
+                return Response(data={"result": "Step or maintenance device is empty"}, status=status.HTTP_400_BAD_REQUEST) 
+            
+        except Exception  as e:
+            return Response(data={"result": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 

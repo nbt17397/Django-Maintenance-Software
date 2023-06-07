@@ -162,6 +162,7 @@ class MaintenanceDevice(ItemBase):
 
 class MaintenanceTask(ItemBase):
     class Meta:
+        unique_together = ('name','maintenance_device')
         ordering = ('sequence', )
 
     
