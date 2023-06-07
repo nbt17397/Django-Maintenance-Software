@@ -1,5 +1,5 @@
 from rest_framework import viewsets, permissions, status, generics
-from .permissions import ( IsUserManager )
+from .permissions import ( IsUserManager, IsSuperUser )
 from .serializers import ( ReadDeviceDocumentSerializer, WriteDeviceDocumentSerializer, MaintenanceTaskDocumentSerializer, ReadMaintenanceAreaDetailSerializer, ReadMaintenanceDeviceSerializer, ReadMaintenanceTaskSerializer, ReadProcessStepSerializer, WriteMaintenanceAreaDetailSerializer, ReadMaintenanceAreaSerializer, 
                           WriteMaintenanceAreaSerializer, ReadBuildingDetailSerializer, ReadBuildingSerializer, UserSerializer, ReadProjectSerializer, 
                           WriteBuildingSerializer, WriteMaintenanceDeviceSerializer, WriteMaintenanceTaskSerializer, WriteProcessStepSerializer, WriteProjectSerializer, WriteBuildingDetailSerializer, ProcessSerializer, CheckingWaySerializer, 
@@ -72,21 +72,21 @@ class UserViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView
         serializer = UserSerializer(users, many=True)
         return Response(data={"users": serializer.data}, status=status.HTTP_200_OK)
     
-    @action(methods=['get'], detail=True, url_path='get_task_by_user')
+    @action(methods=['get'], detail=True, url_path='get-task-by-user')
     def get_task_by_user(self, request, pk):
         maintenance_tasks= self.get_object().maintenance_task_ids.filter(active=True)
 
         serializer = ReadMaintenanceTaskSerializer(maintenance_tasks, many=True)
         return Response(data={"maintenance_tasks": serializer.data}, status=status.HTTP_200_OK)
     
-    @action(methods=['get'], detail=True, url_path='get_project_by_user')
+    @action(methods=['get'], detail=True, url_path='get-project-by-user')
     def get_project_by_user(self, request, pk):
         projects= self.get_object().project_user_rel.filter(active=True)
 
         serializer = ReadProjectSerializer(projects, many=True)
         return Response(data={"projects": serializer.data}, status=status.HTTP_200_OK)
     
-    @action(methods=['get'], detail=True, url_path='get_maintenance_device_by_user')
+    @action(methods=['get'], detail=True, url_path='get-maintenance-device-by-user')
     def get_maintenance_device_by_user(self, request, pk):
         projects= self.get_object().maintenance_device_user_rel.filter(active=True)
 
@@ -96,15 +96,24 @@ class UserViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView
 
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.filter(active=True)
-    permission_classes = [permissions.IsAuthenticated, IsUserManager]
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            permission_classes = [permissions.IsAuthenticated, IsSuperUser]
+        elif self.action in ['list']:
+            permission_classes = [permissions.IsAuthenticated, IsUserManager]
+        else:
+            permission_classes = [permissions.AllowAny]
+
+        return [permission() for permission in permission_classes]
 
     def get_serializer_class(self):
-        if self.action in ('create', 'update', 'partial_update', 'destroy'):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return WriteProjectSerializer
 
         return ReadProjectSerializer
     
-    @action(methods=['get'], detail=True, url_path='get_building_by_project')
+    @action(methods=['get'], detail=True, url_path='get-building-by-project')
     def get_building_by_project(self, request, pk):
         buildings= self.get_object().building_ids.filter(active=True)
         
@@ -117,6 +126,15 @@ class ProjectViewSet(viewsets.ModelViewSet):
 class BuildingViewSet(viewsets.ModelViewSet):
     queryset = Building.objects.filter(active=True)
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action in ('create', 'update', 'partial_update', 'destroy'):
+            permission_classes = [permissions.IsAuthenticated, IsSuperUser]
+        elif self.action == 'list':
+            permission_classes = [permissions.IsAuthenticated, IsUserManager]
+        else:
+            permission_classes = [permissions.AllowAny]
+        return [permission() for permission in permission_classes]
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update', 'destroy'):
@@ -163,12 +181,13 @@ class ProcessViewSet(viewsets.ModelViewSet):
     serializer_class = ProcessSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    @action(methods=['get'], detail=True, url_path='get_section_by_process')
+    @action(methods=['get'], detail=True, url_path='get-section-by-process')
     def get_section_by_process(self, request, pk):
         sections= self.get_object().section_ids.filter(active=True)
 
         serializer = ReadProcessSectionSerializer(sections, many=True)
         return Response(data={"sections": serializer.data}, status=status.HTTP_200_OK)
+    
 
 
 class CheckingWayViewSet(viewsets.ModelViewSet):
@@ -187,12 +206,25 @@ class ProcessSectionViewSet(viewsets.ModelViewSet):
 
         return ReadProcessSectionSerializer
     
-    @action(methods=['get'], detail=True, url_path='get_step_by_section')
+    @action(methods=['get'], detail=True, url_path='get-step-by-section')
     def get_step_by_section(self, request, pk):
         steps= self.get_object().step_ids.filter(active=True)
 
         serializer = ReadProcessStepSerializer(steps, many=True)
         return Response(data={"steps": serializer.data}, status=status.HTTP_200_OK)
+    
+    @action(methods=['get','post'], detail=True, url_path='generate-maintenance-tasks')
+    def generate_maintenance_tasks(self, request, pk):
+        try:
+            steps = self.get_object().step_ids.filter(active=True)
+
+            if steps.exists():
+                [MaintenanceTask.objects.create(name=step.name, sequence=step.sequence, maintenance_device_id=1, step=step, checking_way=step.checking_way) for step in steps]
+
+            return Response(data={"result": "Generated steps successfully"}, status=status.HTTP_200_OK)
+        except:
+            return Response(data={"result": "An exception occurred"}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class ProcessStepViewSet(viewsets.ModelViewSet):

@@ -26,9 +26,29 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-_%03)0g$a7(cm5i_(+@=mihrc8f27xn*oy&q0e3r#n=!#bw8(x'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True 
 
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
 ALLOWED_HOSTS = ["*"]
+# ALLOWED_HOSTS = ['http://127.0.0.1:8000']
+# CORS_ALLOWED_ORIGINS = ['http://127.0.0.1:8000']
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+
+CORS_ORIGIN_WHITELIST = [
+    "https://example.com",
+    "https://sub.example.com",
+    "http://localhost:8080",
+    "http://127.0.0.1:8000"
+]
 
 
 # Application definition
@@ -45,7 +65,8 @@ INSTALLED_APPS = [
     'import_export',
     'knox',
     'drf_standardized_errors',
-    'rest_framework_swagger',
+    'corsheaders',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -53,9 +74,11 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'requestlogs.middleware.RequestLogsMiddleware',
 ]
 
 ROOT_URLCONF = 'maintenance_software.urls'
@@ -104,6 +127,40 @@ DATABASES = {
         'PASSWORD': '12345678',
         'HOST': ''
     }
+}
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'requestlogs_to_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'C:\\Users\\ADMIN\\Documents\\Django\\maintenance_software\\maintenance\\logs\\requestlogs.log',
+
+        },
+    },
+    'loggers': {
+        'requestlogs': {
+            'handlers': ['requestlogs_to_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
+
+REQUESTLOGS = {
+    'STORAGE_CLASS': 'requestlogs.storages.LoggingStorage',
+    'ENTRY_CLASS': 'requestlogs.entries.RequestLogEntry',
+    'SERIALIZER_CLASS': 'requestlogs.storages.BaseEntrySerializer',
+    'SECRETS': ['password', 'token'],
+    'ATTRIBUTE_NAME': '_requestlog',
+    'METHODS': ('GET', 'PUT', 'PATCH', 'POST', 'DELETE'),
+    'JSON_ENSURE_ASCII': True,
+    'IGNORE_USER_FIELD': None,
+    'IGNORE_USERS': [],
+    'IGNORE_PATHS': None,
 }
 
 AUTH_USER_MODEL = 'maintenance.User'
@@ -156,7 +213,8 @@ IMPORT_EXPORT_USE_TRANSACTIONS = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-MEDIA_ROOT = '%s/mantenance/static' % BASE_DIR
+MEDIA_ROOT = '%s/maintenance/static' % BASE_DIR  
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

@@ -115,7 +115,7 @@ class DeviceDocument(ItemBase):
     class Meta:
         unique_together = ('name',)
 
-    path = models.FileField(upload_to='device_document/path/%Y/%m', null=True)
+    path = models.FileField(upload_to='documents/path/%Y/%m', null=True)
     process = models.ForeignKey("Device", related_name="device_document_ids",null=True,on_delete=models.SET_NULL)
 
 
@@ -169,8 +169,8 @@ class MaintenanceTask(ItemBase):
     maintenance_device = models.ForeignKey(MaintenanceDevice, related_name="maintenance_task_ids",null=True,on_delete=models.SET_NULL)
     is_qualified = models.BooleanField(default=False)
     note = models.TextField(null=True)
-    starting_date = models.DateTimeField(null=False)
-    ending_date = models.DateTimeField(null=False)
+    starting_date = models.DateTimeField(null=True)
+    ending_date = models.DateTimeField(null=True)
     employee = models.ForeignKey(User, related_name="maintenance_task_ids",null=True,on_delete=models.SET_NULL)
     step = models.ForeignKey(ProcessStep, related_name="maintenance_task_ids",null=True,on_delete=models.SET_NULL)
     checking_way = models.ForeignKey(CheckingWay, related_name="maintenance_task_ids",null=True,on_delete=models.SET_NULL)
@@ -180,7 +180,7 @@ class MaintenanceTaskDocument(ItemBase):
     class Meta:
         unique_together = ('name',)
 
-    path = models.FileField(upload_to='maintenance_task_document/path/%Y/%m', null=True)
+    path = models.FileField(upload_to='documents/path/%Y/%m', null=True)
     maintenance_task_document = models.ForeignKey(MaintenanceTask, related_name="maintenance_task_document_ids",null=True,on_delete=models.SET_NULL)
 
 
