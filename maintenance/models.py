@@ -116,7 +116,7 @@ class DeviceDocument(ItemBase):
         unique_together = ('name',)
 
     path = models.FileField(upload_to='documents/path/%Y/%m', null=True)
-    process = models.ForeignKey("Device", related_name="device_document_ids",null=True,on_delete=models.SET_NULL)
+    device = models.ForeignKey("Device", related_name="device_document_ids",null=True,on_delete=models.SET_NULL)
 
 
 class Device(ItemBase):

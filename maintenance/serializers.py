@@ -172,7 +172,7 @@ class ReadDeviceDocumentSerializer(ModelSerializer):
 
     class Meta:
         model = DeviceDocument
-        fields = ['id', 'name', 'path', 'process']
+        fields = ['id', 'name', 'path', 'device']
 
 class WriteDeviceDocumentSerializer(ModelSerializer):
 
