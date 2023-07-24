@@ -28,11 +28,17 @@ SECRET_KEY = 'django-insecure-_%03)0g$a7(cm5i_(+@=mihrc8f27xn*oy&q0e3r#n=!#bw8(x
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True 
 
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_CREDENTIALS = True
-ALLOWED_HOSTS = ["*"]
-# ALLOWED_HOSTS = ['http://127.0.0.1:8000']
-# CORS_ALLOWED_ORIGINS = ['http://127.0.0.1:8000']
+# CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ALLOW_CREDENTIALS = True
+# ALLOWED_HOSTS = ["*"]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://playcode.io/",
+    "https://assoftware.netlify.app/"
+]
+
+
 
 CORS_ALLOW_METHODS = [
     "DELETE",
@@ -41,13 +47,6 @@ CORS_ALLOW_METHODS = [
     "PATCH",
     "POST",
     "PUT",
-]
-
-CORS_ORIGIN_WHITELIST = [
-    "https://example.com",
-    "https://sub.example.com",
-    "http://localhost:8080",
-    "http://127.0.0.1:8000"
 ]
 
 
