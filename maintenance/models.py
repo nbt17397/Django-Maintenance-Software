@@ -50,6 +50,7 @@ class Project(ItemBase):
     manager = models.ForeignKey(
         User, related_name="project_ids", null=True, on_delete=models.CASCADE)
     members = models.ManyToManyField(User, related_name="project_user_rel")
+    devices = models.ManyToManyField("Device", related_name="project_device_rel")
 
 class Building(ItemBase):
 
@@ -138,8 +139,7 @@ class Device(ItemBase):
     model = models.CharField(max_length=50)
     code = models.CharField(max_length=50)
     state = models.PositiveSmallIntegerField(choices=STATE, default=Stock)
-    project = models.ForeignKey(Project, related_name="device_ids",null=False,on_delete=models.CASCADE)
-    process = models.ForeignKey(Process, related_name="process_ids",null=True,on_delete=models.SET_NULL) #warning related_name
+    process = models.ForeignKey(Process, related_name="process_ids",null=True,on_delete=models.SET_NULL)
 
 
 

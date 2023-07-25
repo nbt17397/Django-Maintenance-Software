@@ -36,22 +36,6 @@ class UserSerializer(ModelSerializer):
         instance.save()
         return instance
 
-# USER
-
-class ReadProjectSerializer(ModelSerializer):
-
-    members = ReadUserSerializer(many=True)
-    manager = ReadUserSerializer()
-
-    class Meta:
-        model = Project
-        fields = '__all__'
-
-
-class WriteProjectSerializer(ModelSerializer):
-    class Meta:
-        model = Project
-        fields = '__all__'
 
 # Building Detail
 
@@ -197,7 +181,7 @@ class ReadDeviceSerializer(ModelSerializer):
 
     class Meta:
         model = Device
-        fields = ['id','name','model','code','project','device_document_ids','process']
+        fields = ['id','name','model','code','device_document_ids','process']
 
 
 class WriteDeviceSerializer(ModelSerializer):
@@ -238,3 +222,21 @@ class WriteMaintenanceTaskSerializer(ModelSerializer):
         model = MaintenanceTask
         fields = '__all__'
 
+
+# Project
+
+class ReadProjectSerializer(ModelSerializer):
+
+    members = ReadUserSerializer(many=True)
+    devices = ReadDeviceSerializer(many=True)
+    manager = ReadUserSerializer()
+
+    class Meta:
+        model = Project
+        fields = '__all__'
+
+
+class WriteProjectSerializer(ModelSerializer):
+    class Meta:
+        model = Project
+        fields = '__all__'
