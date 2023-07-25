@@ -27,7 +27,7 @@ admin.site.register(DeviceDocument)
 
 @admin.register(Device)
 class DeviceAdmin(ImportExportModelAdmin):
-    list_display = ["name","model", "code", "process", "project"]
+    list_display = ["name","model", "code", "process"]
     resource_class = DeviceResource
     
 admin.site.register(MaintenanceDevice)
