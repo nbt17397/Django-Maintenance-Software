@@ -13,6 +13,9 @@ class User(AbstractUser):
     name = models.CharField(max_length=150, null=False)
     device_token = models.CharField(max_length=50, null=True)
     is_manager = models.BooleanField(default=True)
+    position = models.CharField(max_length=100, null=True)
+    level = models.CharField(max_length=100, null=True)
+    birth_date = models.DateTimeField(null=True)
 
 
 class ItemBase(models.Model):
