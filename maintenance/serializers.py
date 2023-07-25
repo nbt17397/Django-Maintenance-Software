@@ -148,7 +148,7 @@ class ReadProcessSectionSerializer(ModelSerializer):
 
     class Meta:
         model = ProcessSection
-        fields = ['id','name', 'sequence', 'step_ids']
+        fields = ['id','name', 'sequence', 'step_ids', "process"]
 
 
 class WriteProcessSectionSerializer(ModelSerializer):
