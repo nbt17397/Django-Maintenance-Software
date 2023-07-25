@@ -121,6 +121,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(data={"buildings": serializer.data}, status=status.HTTP_200_OK)
   
     
+    @action(methods=['get'], detail=True, url_path='get-device-by-project')
+    def get_device_by_project(self, request, pk):
+        devices= self.get_object().device_ids.filter(active=True)
+        
+        serializer = ReadDeviceSerializer(devices, many=True)
+        return Response(data={"devices": serializer.data}, status=status.HTTP_200_OK)
+    
     
 
 class BuildingViewSet(viewsets.ModelViewSet):

@@ -59,7 +59,7 @@ class WriteProjectSerializer(ModelSerializer):
 class ReadBuildingDetailSerializer(ModelSerializer):
     class Meta:
         model = BuildingDetail
-        fields = ['id','name','description']
+        fields = ['id','name','description','building']
 
 
 class WriteBuildingDetailSerializer(ModelSerializer):
@@ -102,7 +102,7 @@ class ReadMaintenanceAreaSerializer(ModelSerializer):
     area_detail_ids = ReadMaintenanceAreaDetailSerializer(many=True)
     class Meta:
         model = MaintenanceArea
-        fields = ['id','name','description','area_detail_ids']
+        fields = ['id','name','description','area_detail_ids','building_detail']
 
 
 class WriteMaintenanceAreaSerializer(ModelSerializer):
@@ -132,7 +132,7 @@ class ReadProcessStepSerializer(ModelSerializer):
     checking_way = CheckingWaySerializer()
     class Meta:
         model = ProcessStep
-        fields = ['id','name','checking_way']
+        fields = ['id','name','checking_way','section']
 
 
 class WriteProcessStepSerializer(ModelSerializer):
