@@ -31,13 +31,13 @@ class BuildingResource(resources.ModelResource):
 
 class DeviceResource(resources.ModelResource):
 
-    project = fields.Field(column_name='project',attribute='project', widget=ForeignKeyWidget(Project, field='code'))
+    # project = fields.Field(column_name='project',attribute='project', widget=ForeignKeyWidget(Project, field='code'))
     process = fields.Field(column_name='process',attribute='process', widget=ForeignKeyWidget(Process, field='process'))
 
     def before_import_row(self, row, row_number=None, **kwargs):
-        if row["project"]:
-            project_code = row["project"]
-            Project.objects.get_or_create(name=project_code, code=project_code, defaults={"name": project_code, "code": project_code})
+        # if row["project"]:
+        #     project_code = row["project"]
+        #     Project.objects.get_or_create(name=project_code, code=project_code, defaults={"name": project_code, "code": project_code})
 
         if row["process"]:
             process_name = row["process"]
@@ -46,7 +46,7 @@ class DeviceResource(resources.ModelResource):
 
     class Meta:
         model = Device
-        fields = ('id', 'name', 'model', 'code', 'process', 'project' )
+        fields = ('id', 'name', 'model', 'code', 'process' )
 
     
 
