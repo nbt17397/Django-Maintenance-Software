@@ -267,10 +267,10 @@ class DeviceViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get'], detail=True, url_path='get-project-by-device')
     def get_project_by_device(self, request, pk):
-        devices= self.get_object().project_device_rel.filter(active=True)
+        projects= self.get_object().project_device_rel.filter(active=True)
 
-        serializer = WriteDeviceSerializer(devices, many=True)
-        return Response(data={"devices": serializer.data}, status=status.HTTP_200_OK)
+        serializer = WriteProjectSerializer(projects, many=True)
+        return Response(data={"projects": serializer.data}, status=status.HTTP_200_OK)
     
     
     
