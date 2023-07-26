@@ -228,7 +228,7 @@ class WriteMaintenanceTaskSerializer(ModelSerializer):
 class ReadProjectSerializer(ModelSerializer):
 
     members = ReadUserSerializer(many=True)
-    devices = ReadDeviceSerializer
+    devices = ReadDeviceSerializer(many=True)
     manager = ReadUserSerializer()
 
     class Meta:
