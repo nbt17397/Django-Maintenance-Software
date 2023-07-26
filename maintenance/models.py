@@ -30,63 +30,6 @@ class ItemBase(models.Model):
     def __str__(self) -> str:
         return self.name
 
-
-class Project(ItemBase):
-    class Meta:
-        unique_together = ('name',)
-
-    Draft, In_Process, Delayed, Finished = range(4)
-    STATE = [
-        (Draft, 'Draft'),
-        (In_Process, 'In_Process'),
-        (Delayed, 'Delayed'),
-        (Finished, 'Finished')
-    ]
-
-    code = models.CharField(max_length=50)
-    state = models.PositiveSmallIntegerField(choices=STATE, default=Draft)
-    starting_date = models.DateTimeField(null=True)
-    ending_date = models.DateTimeField(null=True)
-    manager = models.ForeignKey(
-        User, related_name="project_ids", null=True, on_delete=models.CASCADE)
-    members = models.ManyToManyField(User, related_name="project_user_rel")
-    devices = models.ManyToManyField("Device", related_name="project_device_rel")
-
-class Building(ItemBase):
-
-    class Meta:
-        unique_together = ('name',)
-
-    description = models.TextField()
-    project = models.ForeignKey(Project, related_name="building_ids",null=False,on_delete=models.CASCADE)
-
-
-class BuildingDetail(ItemBase):
-    class Meta:
-        unique_together = ('name',)
-
-    description = models.TextField()
-    building = models.ForeignKey(Building, related_name="building_detail_ids", null=False,on_delete=models.CASCADE)
-
-
-class MaintenanceArea(ItemBase):
-
-    class Meta:
-        unique_together = ('name',)
-
-    description = models.TextField()
-    building_detail = models.ForeignKey(BuildingDetail, related_name="area_ids",null=False,on_delete=models.CASCADE)
-
-
-class MaintenanceAreaDetail(ItemBase):
-  
-    class Meta:
-        unique_together = ('name',)
-
-    description = models.TextField()
-    maintenance_area = models.ForeignKey(MaintenanceArea, related_name="area_detail_ids",null=False,on_delete=models.CASCADE)
-
-
 class CheckingWay(ItemBase):
     class Meta:
         unique_together = ('name',)
@@ -140,6 +83,63 @@ class Device(ItemBase):
     code = models.CharField(max_length=50)
     state = models.PositiveSmallIntegerField(choices=STATE, default=Stock)
     process = models.ForeignKey(Process, related_name="process_ids",null=True,on_delete=models.SET_NULL)
+    
+class Project(ItemBase):
+    class Meta:
+        unique_together = ('name',)
+
+    Draft, In_Process, Delayed, Finished = range(4)
+    STATE = [
+        (Draft, 'Draft'),
+        (In_Process, 'In_Process'),
+        (Delayed, 'Delayed'),
+        (Finished, 'Finished')
+    ]
+
+    code = models.CharField(max_length=50)
+    state = models.PositiveSmallIntegerField(choices=STATE, default=Draft)
+    starting_date = models.DateTimeField(null=True)
+    ending_date = models.DateTimeField(null=True)
+    manager = models.ForeignKey(
+        User, related_name="project_ids", null=True, on_delete=models.CASCADE)
+    members = models.ManyToManyField(User, related_name="project_user_rel")
+    devices = models.ManyToManyField(Device, related_name="project_device_rel")
+
+class Building(ItemBase):
+
+    class Meta:
+        unique_together = ('name',)
+
+    description = models.TextField()
+    project = models.ForeignKey(Project, related_name="building_ids",null=False,on_delete=models.CASCADE)
+
+
+class BuildingDetail(ItemBase):
+    class Meta:
+        unique_together = ('name',)
+
+    description = models.TextField()
+    building = models.ForeignKey(Building, related_name="building_detail_ids", null=False,on_delete=models.CASCADE)
+
+
+class MaintenanceArea(ItemBase):
+
+    class Meta:
+        unique_together = ('name',)
+
+    description = models.TextField()
+    building_detail = models.ForeignKey(BuildingDetail, related_name="area_ids",null=False,on_delete=models.CASCADE)
+
+
+class MaintenanceAreaDetail(ItemBase):
+  
+    class Meta:
+        unique_together = ('name',)
+
+    description = models.TextField()
+    maintenance_area = models.ForeignKey(MaintenanceArea, related_name="area_detail_ids",null=False,on_delete=models.CASCADE)
+
+
 
 
 
