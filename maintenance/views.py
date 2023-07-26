@@ -273,6 +273,7 @@ class DeviceViewSet(viewsets.ModelViewSet):
         return Response(data={"devices": serializer.data}, status=status.HTTP_200_OK)
     
     
+    
 
 class MaintenanceDeviceViewSet(viewsets.ModelViewSet):
     queryset = MaintenanceDevice.objects.filter(active=True)
