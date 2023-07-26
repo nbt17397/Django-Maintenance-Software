@@ -83,7 +83,7 @@ class UserViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView
     def get_project_by_user(self, request, pk):
         projects= self.get_object().project_user_rel.filter(active=True)
 
-        serializer = ReadProjectSerializer(projects, many=True)
+        serializer = WriteProjectSerializer(projects, many=True)
         return Response(data={"projects": serializer.data}, status=status.HTTP_200_OK)
     
     @action(methods=['get'], detail=True, url_path='get-maintenance-device-by-user')
@@ -266,10 +266,10 @@ class DeviceViewSet(viewsets.ModelViewSet):
     
 
     @action(methods=['get'], detail=True, url_path='get-project-by-device')
-    def get_device_by_project(self, request, pk):
+    def get_project_by_device(self, request, pk):
         devices= self.get_object().project_device_rel.filter(active=True)
 
-        serializer = ReadDeviceSerializer(devices, many=True)
+        serializer = WriteDeviceSerializer(devices, many=True)
         return Response(data={"devices": serializer.data}, status=status.HTTP_200_OK)
     
     
