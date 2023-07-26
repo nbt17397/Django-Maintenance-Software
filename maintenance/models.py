@@ -102,8 +102,8 @@ class Project(ItemBase):
     ending_date = models.DateTimeField(null=True)
     manager = models.ForeignKey(
         User, related_name="project_ids", null=True, on_delete=models.CASCADE)
-    members = models.ManyToManyField(User, related_name="project_user_rel", null=True)
-    devices = models.ManyToManyField(Device, related_name="project_device_rel", null=True)
+    members = models.ManyToManyField(User, related_name="project_user_rel", blank=True)
+    devices = models.ManyToManyField(Device, related_name="project_device_rel", blank=True)
 
 class Building(ItemBase):
 
@@ -156,7 +156,7 @@ class MaintenanceDevice(ItemBase):
 
     description = models.TextField()
     device = models.ForeignKey(Device, related_name="maintenance_device_ids", null=True, on_delete=models.SET_NULL)
-    members = models.ManyToManyField(User, related_name="maintenance_device_user_rel", null=True)
+    members = models.ManyToManyField(User, related_name="maintenance_device_user_rel", blank=True)
     starting_date = models.DateTimeField(null=False)
     ending_date = models.DateTimeField(null=False)
     maintenance_area_detail = models.ForeignKey(MaintenanceAreaDetail, related_name="maintenance_device_ids", null=True, on_delete=models.SET_NULL)
