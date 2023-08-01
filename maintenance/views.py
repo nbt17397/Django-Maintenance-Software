@@ -152,6 +152,13 @@ class BuildingDetailViewSet(viewsets.ModelViewSet):
             return WriteBuildingDetailSerializer
 
         return ReadBuildingDetailSerializer
+    
+    @action(methods=['get'], detail=True, url_path='get-maintenance-area')
+    def get_maintenance_area(self, request, pk):
+        maintenance_area= self.get_object().area_ids.filter(active=True)
+        
+        serializer = ReadMaintenanceAreaSerializer(maintenance_area, many=True)
+        return Response(data={"results": serializer.data}, status=status.HTTP_200_OK)
 
 
 class MaintenanceAreaViewSet(viewsets.ModelViewSet):
