@@ -83,6 +83,7 @@ class Device(ItemBase):
     code = models.CharField(max_length=50)
     state = models.PositiveSmallIntegerField(choices=STATE, default=Stock)
     process = models.ForeignKey(Process, related_name="process_ids",null=True,on_delete=models.SET_NULL)
+    is_part = models.BooleanField(default=False)
     
 class Project(ItemBase):
     class Meta:
@@ -160,16 +161,35 @@ class MaintenanceDevice(ItemBase):
     starting_date = models.DateTimeField(null=False)
     ending_date = models.DateTimeField(null=False)
     maintenance_area_detail = models.ForeignKey(MaintenanceAreaDetail, related_name="maintenance_device_ids", null=True, on_delete=models.SET_NULL)
-    section = models.ForeignKey(ProcessSection, related_name="maintenance_device_ids", null=True, on_delete=models.SET_NULL)
+
+
+class MaintenanceDeviceItem(ItemBase):
+    class Meta:
+        ordering = ('starting_date', )
+
+    Ready, Running, Stopped = range(3)
+    STATE = [
+        (Ready, 'ready'),
+        (Running, 'running'),
+        (Stopped, 'stopped')
+    ]
+
+    description = models.TextField()
+    device = models.ForeignKey(Device, related_name="maintenance_device_item_ids", null=True, on_delete=models.SET_NULL)
+    maintenance_device = models.ForeignKey(MaintenanceDevice, related_name="maintenance_device_item_ids", null=True, on_delete=models.SET_NULL)
+    members = models.ManyToManyField(User, related_name="maintenance_device_item_user_rel", blank=True)
+    starting_date = models.DateTimeField(null=False)
+    ending_date = models.DateTimeField(null=False)
+    # section = models.ForeignKey(ProcessSection, related_name="maintenance_device_ids", null=True, on_delete=models.SET_NULL)
 
 class MaintenanceTask(ItemBase):
     class Meta:
-        unique_together = ('name','maintenance_device')
+        unique_together = ('name','maintenance_device_item')
         ordering = ('sequence', )
 
     
     sequence = models.IntegerField(default=1)
-    maintenance_device = models.ForeignKey(MaintenanceDevice, related_name="maintenance_task_ids",null=True,on_delete=models.SET_NULL)
+    maintenance_device_item = models.ForeignKey(MaintenanceDeviceItem, related_name="maintenance_task_ids",null=True,on_delete=models.SET_NULL)
     is_qualified = models.BooleanField(default=False)
     note = models.TextField(null=True)
     starting_date = models.DateTimeField(null=True)
@@ -184,7 +204,7 @@ class MaintenanceTaskDocument(ItemBase):
         unique_together = ('name',)
 
     path = models.FileField(upload_to='documents/path/%Y/%m', null=True)
-    maintenance_task_document = models.ForeignKey(MaintenanceTask, related_name="maintenance_task_document_ids",null=True,on_delete=models.SET_NULL)
+    maintenance_task = models.ForeignKey(MaintenanceTask, related_name="maintenance_task_document_ids",null=True,on_delete=models.SET_NULL)
 
 
     

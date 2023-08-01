@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
-from .models import MaintenanceDevice, Building, BuildingDetail, MaintenanceArea, MaintenanceAreaDetail, MaintenanceTask, MaintenanceTaskDocument, User, Project, Process, CheckingWay, ProcessSection, ProcessStep, DeviceDocument, Device
+from .models import MaintenanceDevice, Building, BuildingDetail, MaintenanceArea, MaintenanceAreaDetail, MaintenanceDeviceItem, MaintenanceTask, MaintenanceTaskDocument, User, Project, Process, CheckingWay, ProcessSection, ProcessStep, DeviceDocument, Device
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -171,7 +171,7 @@ class WriteDeviceDocumentSerializer(ModelSerializer):
 class MaintenanceTaskDocumentSerializer(ModelSerializer):
     class Meta:
         model = MaintenanceTaskDocument
-        fields = ['id', 'name', 'path', 'maintenance_task_document']
+        fields = ['id', 'name', 'path', 'maintenance_task']
 
 # Device 
 
@@ -181,7 +181,7 @@ class ReadDeviceSerializer(ModelSerializer):
 
     class Meta:
         model = Device
-        fields = ['id','name','model','code','device_document_ids','process']
+        fields = ['id','name','model','code','device_document_ids','process', 'is_part']
 
 
 class WriteDeviceSerializer(ModelSerializer):
@@ -190,17 +190,37 @@ class WriteDeviceSerializer(ModelSerializer):
         fields = '__all__'
 
 
-# Maintenance Device
 
+
+# Maintenance Device Item
+
+class ReadMaintenanceDeviceItemSerializer(ModelSerializer):
+    members = ReadUserSerializer(many=True)
+    device_name = serializers.CharField(source="device.name")
+    process_id = serializers.IntegerField(source="device.process.id")
+    
+
+    class Meta:
+        model = MaintenanceDeviceItem
+        fields = ["id","name","description","starting_date","ending_date","device","device_name","process_id","members"]
+
+
+class WriteMaintenanceDeviceItemSerializer(ModelSerializer):
+    class Meta:
+        model = MaintenanceDeviceItem
+        fields = '__all__'
+
+# Maintenance Device
 
 class ReadMaintenanceDeviceSerializer(ModelSerializer):
     members = ReadUserSerializer(many=True)
     device_name = serializers.CharField(source="device.name")
+    maintenance_device_item_ids = ReadMaintenanceDeviceItemSerializer(many=True)
     
 
     class Meta:
         model = MaintenanceDevice
-        fields = ["id","name","description","starting_date","ending_date","device","device_name","maintenance_area_detail","section","members"]
+        fields = ["id","name","description","starting_date","ending_date","device","device_name","maintenance_area_detail","members","maintenance_device_item_ids"]
 
 
 class WriteMaintenanceDeviceSerializer(ModelSerializer):
@@ -215,7 +235,7 @@ class ReadMaintenanceTaskSerializer(ModelSerializer):
     maintenance_task_document_ids = MaintenanceTaskDocumentSerializer(many=True)
     class Meta:
         model = MaintenanceTask
-        fields = ["id","name","sequence","maintenance_device","is_qualified","note","employee","maintenance_task_document_ids"]
+        fields = ["id","name","sequence","maintenance_device_item","is_qualified","note","employee","maintenance_task_document_ids"]
 
 class WriteMaintenanceTaskSerializer(ModelSerializer):
     class Meta:

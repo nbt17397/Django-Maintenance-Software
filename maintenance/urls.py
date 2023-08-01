@@ -16,6 +16,7 @@ router.register('process_step', views.ProcessStepViewSet)
 router.register('device_document', views.DeviceDocumentViewSet)
 router.register('device', views.DeviceViewSet)
 router.register('maintenance_device', views.MaintenanceDeviceViewSet)
+router.register('maintenance_device_item', views.MaintenanceDeviceItemViewSet)
 router.register('maintenance_task', views.MaintenanceTaskViewSet)
 router.register('maintenance_task_document', views.MaintenanceTaskDocumentViewSet)
 

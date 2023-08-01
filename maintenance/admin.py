@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ( MaintenanceDevice, Building, BuildingDetail, MaintenanceArea, MaintenanceAreaDetail, MaintenanceTask, MaintenanceTaskDocument, 
+from .models import ( MaintenanceDevice, Building, BuildingDetail, MaintenanceArea, MaintenanceAreaDetail, MaintenanceDeviceItem, MaintenanceTask, MaintenanceTaskDocument, 
                      User, Project, Process, CheckingWay, ProcessSection, ProcessStep, DeviceDocument, Device)
 from .resources import BuildingResource, ProjectResource, DeviceResource
 from import_export.admin import ImportExportModelAdmin
@@ -31,5 +31,6 @@ class DeviceAdmin(ImportExportModelAdmin):
     resource_class = DeviceResource
     
 admin.site.register(MaintenanceDevice)
+admin.site.register(MaintenanceDeviceItem)
 admin.site.register(MaintenanceTask)
 admin.site.register(MaintenanceTaskDocument)

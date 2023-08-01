@@ -1,10 +1,10 @@
 from rest_framework import viewsets, permissions, status, generics
 from .permissions import ( IsUserManager, IsSuperUser )
-from .serializers import ( ReadDeviceDocumentSerializer, WriteDeviceDocumentSerializer, MaintenanceTaskDocumentSerializer, ReadMaintenanceAreaDetailSerializer, ReadMaintenanceDeviceSerializer, ReadMaintenanceTaskSerializer, ReadProcessStepSerializer, WriteMaintenanceAreaDetailSerializer, ReadMaintenanceAreaSerializer, 
+from .serializers import ( ReadDeviceDocumentSerializer, ReadMaintenanceDeviceItemSerializer, WriteDeviceDocumentSerializer, MaintenanceTaskDocumentSerializer, ReadMaintenanceAreaDetailSerializer, ReadMaintenanceDeviceSerializer, ReadMaintenanceTaskSerializer, ReadProcessStepSerializer, WriteMaintenanceAreaDetailSerializer, ReadMaintenanceAreaSerializer, 
                           WriteMaintenanceAreaSerializer, ReadBuildingDetailSerializer, ReadBuildingSerializer, UserSerializer, ReadProjectSerializer, 
-                          WriteBuildingSerializer, WriteMaintenanceDeviceSerializer, WriteMaintenanceTaskSerializer, WriteProcessStepSerializer, WriteProjectSerializer, WriteBuildingDetailSerializer, ProcessSerializer, CheckingWaySerializer, 
+                          WriteBuildingSerializer, WriteMaintenanceDeviceItemSerializer, WriteMaintenanceDeviceSerializer, WriteMaintenanceTaskSerializer, WriteProcessStepSerializer, WriteProjectSerializer, WriteBuildingDetailSerializer, ProcessSerializer, CheckingWaySerializer, 
                           ReadProcessSectionSerializer, WriteProcessSectionSerializer, ReadDeviceSerializer, WriteDeviceSerializer)
-from .models import ( Building, BuildingDetail, MaintenanceArea, MaintenanceAreaDetail, MaintenanceDevice, MaintenanceTask, MaintenanceTaskDocument, User, Project, Process, CheckingWay, ProcessSection, ProcessStep, Device, DeviceDocument)
+from .models import ( Building, BuildingDetail, MaintenanceArea, MaintenanceAreaDetail, MaintenanceDevice, MaintenanceDeviceItem, MaintenanceTask, MaintenanceTaskDocument, User, Project, Process, CheckingWay, ProcessSection, ProcessStep, Device, DeviceDocument)
 from rest_framework.parsers import MultiPartParser
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -278,6 +278,16 @@ class DeviceViewSet(viewsets.ModelViewSet):
 
         return ReadDeviceSerializer
     
+    def list(self, request):
+        devices = Device.objects.filter(active=True)
+        is_part = request.query_params.get('is_part')
+        if is_part is not None:
+            devices = devices.filter(is_part=is_part)
+
+        serializer = ReadDeviceSerializer(devices, many=True)
+        return Response(data={"results": serializer.data}, status=status.HTTP_200_OK)
+    
+    
 
     @action(methods=['get'], detail=True, url_path='get-project-by-device')
     def get_project_by_device(self, request, pk):
@@ -299,6 +309,16 @@ class MaintenanceDeviceViewSet(viewsets.ModelViewSet):
 
         return ReadMaintenanceDeviceSerializer
     
+
+class MaintenanceDeviceItemViewSet(viewsets.ModelViewSet):
+    queryset = MaintenanceDeviceItem.objects.filter(active=True)
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action in ('create', 'update', 'partial_update', 'destroy'):
+            return WriteMaintenanceDeviceItemSerializer
+
+        return ReadMaintenanceDeviceItemSerializer
 
 class MaintenanceTaskDocumentViewSet(viewsets.ModelViewSet):
     queryset = MaintenanceTaskDocument.objects.filter(active=True)
