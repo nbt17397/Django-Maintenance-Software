@@ -182,6 +182,13 @@ class MaintenanceAreaDetailViewSet(viewsets.ModelViewSet):
 
         return ReadMaintenanceAreaDetailSerializer
     
+    @action(methods=['get'], detail=True, url_path='get-maintenance-device')
+    def get_maintenance_device(self, request, pk):
+        maintenance_devices= self.get_object().maintenance_device_ids.filter(active=True).filter(is_part=False)
+        
+        serializer = ReadMaintenanceDeviceSerializer(maintenance_devices, many=True)
+        return Response(data={"results": serializer.data}, status=status.HTTP_200_OK)
+    
 
 class ProcessViewSet(viewsets.ModelViewSet):
     queryset = Process.objects.filter(active=True)

@@ -162,7 +162,7 @@ class MaintenanceDevice(ItemBase):
     maintenance_area_detail = models.ForeignKey(MaintenanceAreaDetail, related_name="maintenance_device_ids", null=True, on_delete=models.SET_NULL)
     section = models.ForeignKey(ProcessSection, related_name="maintenance_device_ids", null=True, on_delete=models.SET_NULL)
     parent_maintenance_detail = models.ForeignKey('MaintenanceDevice', related_name="children_maintenance_device_ids", null=True, on_delete=models.SET_NULL)
-    
+    is_part = models.BooleanField(default=False)
 
 class MaintenanceTask(ItemBase):
     class Meta:

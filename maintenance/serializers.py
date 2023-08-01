@@ -199,7 +199,7 @@ class MaintenanceDeviceSerializer(ModelSerializer):
 
     class Meta:
         model = MaintenanceDevice
-        fields = ["id","name","description","starting_date","ending_date","device","device_name","maintenance_area_detail","section","members","children_maintenance_device_ids"]
+        fields = ["id","name","description","starting_date","ending_date","device","device_name","maintenance_area_detail","section","members","children_maintenance_device_ids","is_part"]
 
 
 class ReadMaintenanceDeviceSerializer(ModelSerializer):
@@ -210,7 +210,7 @@ class ReadMaintenanceDeviceSerializer(ModelSerializer):
 
     class Meta:
         model = MaintenanceDevice
-        fields = ["id","name","description","starting_date","ending_date","device","device_name","maintenance_area_detail","section","members","children_maintenance_device_ids"]
+        fields = ["id","name","description","starting_date","ending_date","device","device_name","maintenance_area_detail","section","members","children_maintenance_device_ids","is_part"]
 
 
 class WriteMaintenanceDeviceSerializer(ModelSerializer):
