@@ -192,15 +192,25 @@ class WriteDeviceSerializer(ModelSerializer):
 
 # Maintenance Device
 
-class ReadMaintenanceDeviceSerializer(ModelSerializer):
+class MaintenanceDeviceSerializer(ModelSerializer):
     members = ReadUserSerializer(many=True)
     device_name = serializers.CharField(source="device.name")
-    section_name = serializers.CharField(source="section.name")
-
+    
 
     class Meta:
         model = MaintenanceDevice
-        fields = ["id","name","description","starting_date","ending_date","device","device_name","maintenance_area_detail","section","section_name","members"]
+        fields = ["id","name","description","starting_date","ending_date","device","device_name","maintenance_area_detail","section","members","children_maintenance_device_ids"]
+
+
+class ReadMaintenanceDeviceSerializer(ModelSerializer):
+    members = ReadUserSerializer(many=True)
+    device_name = serializers.CharField(source="device.name")
+    children_maintenance_device_ids = MaintenanceDeviceSerializer(many=True)
+    
+
+    class Meta:
+        model = MaintenanceDevice
+        fields = ["id","name","description","starting_date","ending_date","device","device_name","maintenance_area_detail","section","members","children_maintenance_device_ids"]
 
 
 class WriteMaintenanceDeviceSerializer(ModelSerializer):

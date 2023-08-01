@@ -161,7 +161,8 @@ class MaintenanceDevice(ItemBase):
     ending_date = models.DateTimeField(null=False)
     maintenance_area_detail = models.ForeignKey(MaintenanceAreaDetail, related_name="maintenance_device_ids", null=True, on_delete=models.SET_NULL)
     section = models.ForeignKey(ProcessSection, related_name="maintenance_device_ids", null=True, on_delete=models.SET_NULL)
-
+    parent_maintenance_detail = models.ForeignKey('MaintenanceDevice', related_name="children_maintenance_device_ids", null=True, on_delete=models.SET_NULL)
+    
 
 class MaintenanceTask(ItemBase):
     class Meta:
