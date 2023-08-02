@@ -172,7 +172,29 @@ class WriteDeviceDocumentSerializer(ModelSerializer):
 
 # Maintenance Task Document
 
-class MaintenanceTaskDocumentSerializer(ModelSerializer):
+class ReadMaintenanceTaskDocumentSerializer(ModelSerializer):
+    path = SerializerMethodField()
+
+    class Meta:
+        model = MaintenanceTaskDocument
+        fields = ['id', 'name', 'path', 'maintenance_task']
+
+
+    def get_path(self, device_document):
+        request = self.context.get('request')
+        if request:
+            filename = device_document.path.name
+            if filename.startswith("static/"):
+                path = '/%s' % filename
+            else:
+                path = '/static/%s' % filename
+            return request.build_absolute_uri(path)
+        return device_document.path.name
+    
+
+class WriteMaintenanceTaskDocumentSerializer(ModelSerializer):
+    path = SerializerMethodField()
+    
     class Meta:
         model = MaintenanceTaskDocument
         fields = ['id', 'name', 'path', 'maintenance_task']
@@ -206,12 +228,12 @@ class WriteDeviceSerializer(ModelSerializer):
 class ReadMaintenanceDeviceItemSerializer(ModelSerializer):
     members = ReadUserSerializer(many=True)
     device_name = serializers.CharField(source="device.name")
-    process_id = serializers.IntegerField(source="device.process.id")
+    # process_id = serializers.IntegerField(source="device.process.id")
     
 
     class Meta:
         model = MaintenanceDeviceItem
-        fields = ["id","name","description","starting_date","ending_date","device","device_name","process_id","members"]
+        fields = ["id","name","description","starting_date","ending_date","device","device_name","members"]
 
 
 class WriteMaintenanceDeviceItemSerializer(ModelSerializer):
@@ -241,7 +263,7 @@ class WriteMaintenanceDeviceSerializer(ModelSerializer):
 
 class ReadMaintenanceTaskSerializer(ModelSerializer):
     employee = ReadUserSerializer()
-    maintenance_task_document_ids = MaintenanceTaskDocumentSerializer(many=True)
+    maintenance_task_document_ids = ReadMaintenanceTaskDocumentSerializer(many=True)
     class Meta:
         model = MaintenanceTask
         fields = ["id","name","sequence","maintenance_device_item","is_qualified","note","employee","maintenance_task_document_ids"]

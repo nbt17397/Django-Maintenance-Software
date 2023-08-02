@@ -1,8 +1,8 @@
 from rest_framework import viewsets, permissions, status, generics
 from .permissions import ( IsUserManager, IsSuperUser )
-from .serializers import ( ReadDeviceDocumentSerializer, ReadMaintenanceDeviceItemSerializer, WriteDeviceDocumentSerializer, MaintenanceTaskDocumentSerializer, ReadMaintenanceAreaDetailSerializer, ReadMaintenanceDeviceSerializer, ReadMaintenanceTaskSerializer, ReadProcessStepSerializer, WriteMaintenanceAreaDetailSerializer, ReadMaintenanceAreaSerializer, 
+from .serializers import ( ReadDeviceDocumentSerializer, ReadMaintenanceDeviceItemSerializer, ReadMaintenanceTaskDocumentSerializer, WriteDeviceDocumentSerializer, ReadMaintenanceAreaDetailSerializer, ReadMaintenanceDeviceSerializer, ReadMaintenanceTaskSerializer, ReadProcessStepSerializer, WriteMaintenanceAreaDetailSerializer, ReadMaintenanceAreaSerializer, 
                           WriteMaintenanceAreaSerializer, ReadBuildingDetailSerializer, ReadBuildingSerializer, UserSerializer, ReadProjectSerializer, 
-                          WriteBuildingSerializer, WriteMaintenanceDeviceItemSerializer, WriteMaintenanceDeviceSerializer, WriteMaintenanceTaskSerializer, WriteProcessStepSerializer, WriteProjectSerializer, WriteBuildingDetailSerializer, ProcessSerializer, CheckingWaySerializer, 
+                          WriteBuildingSerializer, WriteMaintenanceDeviceItemSerializer, WriteMaintenanceDeviceSerializer, WriteMaintenanceTaskDocumentSerializer, WriteMaintenanceTaskSerializer, WriteProcessStepSerializer, WriteProjectSerializer, WriteBuildingDetailSerializer, ProcessSerializer, CheckingWaySerializer, 
                           ReadProcessSectionSerializer, WriteProcessSectionSerializer, ReadDeviceSerializer, WriteDeviceSerializer)
 from .models import ( Building, BuildingDetail, MaintenanceArea, MaintenanceAreaDetail, MaintenanceDevice, MaintenanceDeviceItem, MaintenanceTask, MaintenanceTaskDocument, User, Project, Process, CheckingWay, ProcessSection, ProcessStep, Device, DeviceDocument)
 from rest_framework.parsers import MultiPartParser
@@ -278,6 +278,15 @@ class DeviceViewSet(viewsets.ModelViewSet):
 
         return ReadDeviceSerializer
     
+
+    def list(self, request):
+        devices = Device.objects.filter(active=True)
+        is_part = request.query_params.get('is_part')
+        if is_part is not None:
+            devices = devices.filter(is_part=is_part)
+        context = {'request': request}
+        serializer = ReadDeviceSerializer(devices, context=context, many=True)
+        return Response(data={"results": serializer.data}, status=status.HTTP_200_OK)
     
 
     @action(methods=['get'], detail=True, url_path='get-project-by-device')
@@ -308,6 +317,13 @@ class MaintenanceDeviceViewSet(viewsets.ModelViewSet):
 
         return ReadMaintenanceDeviceSerializer
     
+    @action(methods=['get'], detail=True, url_path='get-maintenance-device-items')
+    def get_maintenance_device_items(self, request, pk):
+        items= self.get_object().maintenance_device_item_ids.filter(active=True)
+        context = {'request': request}
+        serializer = ReadMaintenanceDeviceItemSerializer(items, context=context, many=True)
+        return Response(data={"results": serializer.data}, status=status.HTTP_200_OK)
+    
 
 class MaintenanceDeviceItemViewSet(viewsets.ModelViewSet):
     queryset = MaintenanceDeviceItem.objects.filter(active=True)
@@ -318,6 +334,13 @@ class MaintenanceDeviceItemViewSet(viewsets.ModelViewSet):
             return WriteMaintenanceDeviceItemSerializer
 
         return ReadMaintenanceDeviceItemSerializer
+    
+    @action(methods=['get'], detail=True, url_path='get-maintenance-tasks')
+    def get_maintenance_tasks(self, request, pk):
+        items= self.get_object().maintenance_task_ids.filter(active=True)
+        context = {'request': request}
+        serializer = ReadMaintenanceTaskSerializer(items, context=context, many=True)
+        return Response(data={"results": serializer.data}, status=status.HTTP_200_OK)
 
 class MaintenanceTaskDocumentViewSet(viewsets.ModelViewSet):
     queryset = MaintenanceTaskDocument.objects.filter(active=True)
@@ -325,9 +348,9 @@ class MaintenanceTaskDocumentViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update', 'destroy'):
-            return MaintenanceTaskDocumentSerializer
+            return WriteMaintenanceTaskDocumentSerializer
 
-        return MaintenanceTaskDocumentSerializer
+        return ReadMaintenanceTaskDocumentSerializer
     
 
 class MaintenanceTaskViewSet(viewsets.ModelViewSet):
