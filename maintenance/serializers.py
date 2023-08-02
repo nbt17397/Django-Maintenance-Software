@@ -214,13 +214,13 @@ class WriteMaintenanceDeviceItemSerializer(ModelSerializer):
 
 class ReadMaintenanceDeviceSerializer(ModelSerializer):
     members = ReadUserSerializer(many=True)
-    device_name = serializers.CharField(source="device.name")
+    device = WriteDeviceSerializer()
     maintenance_device_item_ids = ReadMaintenanceDeviceItemSerializer(many=True)
     
 
     class Meta:
         model = MaintenanceDevice
-        fields = ["id","name","description","starting_date","ending_date","device","device_name","maintenance_area_detail","members","maintenance_device_item_ids"]
+        fields = ["id","name","description","starting_date","ending_date","device","maintenance_area_detail","members","maintenance_device_item_ids"]
 
 
 class WriteMaintenanceDeviceSerializer(ModelSerializer):
