@@ -145,8 +145,12 @@ class WriteProcessSectionSerializer(ModelSerializer):
 class ReadDeviceDocumentSerializer(ModelSerializer):
     path = SerializerMethodField()
 
+    class Meta:
+        model = DeviceDocument
+        fields = ['id', 'name', 'path', 'device']
+
     def get_path(self, device_document):
-        request = self.context['request']
+        request = self.context.get('request')
         filename = device_document.path.name
         if filename.startswith("static/"):
             path = '/%s' % filename
@@ -154,9 +158,7 @@ class ReadDeviceDocumentSerializer(ModelSerializer):
             path = '/static/%s' % filename
         return request.build_absolute_uri(path)
 
-    class Meta:
-        model = DeviceDocument
-        fields = ['id', 'name', 'path', 'device']
+    
 
 class WriteDeviceDocumentSerializer(ModelSerializer):
 
@@ -176,12 +178,17 @@ class MaintenanceTaskDocumentSerializer(ModelSerializer):
 # Device 
 
 class ReadDeviceSerializer(ModelSerializer):
-    device_document_ids = ReadDeviceDocumentSerializer(many=True)
     process = ProcessSerializer()
 
     class Meta:
         model = Device
         fields = ['id','name','model','code','device_document_ids','process', 'is_part']
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['device_document_ids'] = ReadDeviceDocumentSerializer(many=True, context=self.context, instance=instance.device_document_ids.all()).data
+        return data
+
 
 
 class WriteDeviceSerializer(ModelSerializer):

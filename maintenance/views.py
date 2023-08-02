@@ -278,15 +278,6 @@ class DeviceViewSet(viewsets.ModelViewSet):
 
         return ReadDeviceSerializer
     
-    def list(self, request):
-        devices = Device.objects.filter(active=True)
-        is_part = request.query_params.get('is_part')
-        if is_part is not None:
-            devices = devices.filter(is_part=is_part)
-
-        serializer = ReadDeviceSerializer(devices, many=True)
-        return Response(data={"results": serializer.data}, status=status.HTTP_200_OK)
-    
     
 
     @action(methods=['get'], detail=True, url_path='get-project-by-device')
