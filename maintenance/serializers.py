@@ -151,12 +151,14 @@ class ReadDeviceDocumentSerializer(ModelSerializer):
 
     def get_path(self, device_document):
         request = self.context.get('request')
-        filename = device_document.path.name
-        if filename.startswith("static/"):
-            path = '/%s' % filename
-        else:
-            path = '/static/%s' % filename
-        return request.build_absolute_uri(path)
+        if request:
+            filename = device_document.path.name
+            if filename.startswith("static/"):
+                path = '/%s' % filename
+            else:
+                path = '/static/%s' % filename
+            return request.build_absolute_uri(path)
+        return device_document.path.name
 
     
 

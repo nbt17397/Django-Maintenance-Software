@@ -287,6 +287,14 @@ class DeviceViewSet(viewsets.ModelViewSet):
         serializer = WriteProjectSerializer(projects, many=True)
         return Response(data={"projects": serializer.data}, status=status.HTTP_200_OK)
     
+
+    @action(methods=['get'], detail=True, url_path='get-documents')
+    def get_documents(self, request, pk):
+        documents= self.get_object().device_document_ids.filter(active=True)
+        context = {'request': request}
+        serializer = ReadDeviceDocumentSerializer(documents,context=context, many=True)
+        return Response(data={"results": serializer.data}, status=status.HTTP_200_OK)
+    
     
     
 
