@@ -96,7 +96,7 @@ class WriteMaintenanceAreaSerializer(ModelSerializer):
 
 # Process
 
-class ProcessSerializer(ModelSerializer):
+class ReadProcessSerializer(ModelSerializer):
     path = SerializerMethodField()
     class Meta:
         model = Process
@@ -104,14 +104,21 @@ class ProcessSerializer(ModelSerializer):
 
     def get_path(self, process):
         request = self.context.get('request')
-        if request:
-            filename = process.path.name
-            if filename.startswith("static/"):
-                path = '/%s' % filename
-            else:
-                path = '/static/%s' % filename
-            return request.build_absolute_uri(path)
-        return process.path.name
+        if process.path:
+            if request:
+                filename = process.path.name
+                if filename.startswith("static/"):
+                    path = '/%s' % filename
+                else:
+                    path = '/static/%s' % filename
+                return request.build_absolute_uri(path)
+            return process.path.name
+        return None
+    
+class WriteProcessSerializer(ModelSerializer):
+    class Meta:
+        model = Process
+        fields = '__all__'
 
 
 # CheckingWay
@@ -165,14 +172,16 @@ class ReadDeviceDocumentSerializer(ModelSerializer):
 
     def get_path(self, device_document):
         request = self.context.get('request')
-        if request:
-            filename = device_document.path.name
-            if filename.startswith("static/"):
-                path = '/%s' % filename
-            else:
-                path = '/static/%s' % filename
-            return request.build_absolute_uri(path)
-        return device_document.path.name
+        if device_document.path:
+            if request:
+                filename = device_document.path.name
+                if filename.startswith("static/"):
+                    path = '/%s' % filename
+                else:
+                    path = '/static/%s' % filename
+                return request.build_absolute_uri(path)
+            return device_document.path.name
+        return None
 
     
 
@@ -196,14 +205,16 @@ class ReadMaintenanceTaskDocumentSerializer(ModelSerializer):
 
     def get_path(self, task_document):
         request = self.context.get('request')
-        if request:
-            filename = task_document.path.name
-            if filename.startswith("static/"):
-                path = '/%s' % filename
-            else:
-                path = '/static/%s' % filename
-            return request.build_absolute_uri(path)
-        return task_document.path.name
+        if task_document.path:
+            if request:
+                filename = task_document.path.name
+                if filename.startswith("static/"):
+                    path = '/%s' % filename
+                else:
+                    path = '/static/%s' % filename
+                return request.build_absolute_uri(path)
+            return task_document.path.name
+        return None
     
 
 class WriteMaintenanceTaskDocumentSerializer(ModelSerializer):

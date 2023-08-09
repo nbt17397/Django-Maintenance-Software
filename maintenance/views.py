@@ -1,8 +1,8 @@
 from rest_framework import viewsets, permissions, status, generics
 from .permissions import ( IsUserManager, IsSuperUser )
-from .serializers import ( ReadDeviceDocumentSerializer, ReadMaintenanceDeviceItemSerializer, ReadMaintenanceTaskDocumentSerializer, WriteDeviceDocumentSerializer, ReadMaintenanceAreaDetailSerializer, ReadMaintenanceDeviceSerializer, ReadMaintenanceTaskSerializer, ReadProcessStepSerializer, WriteMaintenanceAreaDetailSerializer, ReadMaintenanceAreaSerializer, 
+from .serializers import ( ReadDeviceDocumentSerializer, ReadMaintenanceDeviceItemSerializer, ReadMaintenanceTaskDocumentSerializer, ReadProcessSerializer, WriteDeviceDocumentSerializer, ReadMaintenanceAreaDetailSerializer, ReadMaintenanceDeviceSerializer, ReadMaintenanceTaskSerializer, ReadProcessStepSerializer, WriteMaintenanceAreaDetailSerializer, ReadMaintenanceAreaSerializer, 
                           WriteMaintenanceAreaSerializer, UserSerializer, ReadProjectSerializer, 
-                           WriteMaintenanceDeviceItemSerializer, WriteMaintenanceDeviceSerializer, WriteMaintenanceTaskDocumentSerializer, WriteMaintenanceTaskSerializer, WriteProcessStepSerializer, WriteProjectSerializer, ProcessSerializer, CheckingWaySerializer, 
+                           WriteMaintenanceDeviceItemSerializer, WriteMaintenanceDeviceSerializer, WriteMaintenanceTaskDocumentSerializer, WriteMaintenanceTaskSerializer, WriteProcessSerializer, WriteProcessStepSerializer, WriteProjectSerializer, CheckingWaySerializer, 
                           ReadProcessSectionSerializer, WriteProcessSectionSerializer, ReadDeviceSerializer, WriteDeviceSerializer)
 from .models import ( MaintenanceArea, MaintenanceAreaDetail, MaintenanceDevice, MaintenanceDeviceItem, MaintenanceTask, MaintenanceTaskDocument, User, Project, Process, CheckingWay, ProcessSection, ProcessStep, Device, DeviceDocument)
 from rest_framework.parsers import MultiPartParser
@@ -192,8 +192,13 @@ class MaintenanceAreaDetailViewSet(viewsets.ModelViewSet):
 
 class ProcessViewSet(viewsets.ModelViewSet):
     queryset = Process.objects.filter(active=True)
-    serializer_class = ProcessSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action in ('create', 'update', 'partial_update', 'destroy'):
+            return WriteProcessSerializer
+
+        return ReadProcessSerializer
 
     @action(methods=['get'], detail=True, url_path='get-section-by-process')
     def get_section_by_process(self, request, pk):
