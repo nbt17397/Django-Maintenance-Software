@@ -35,8 +35,8 @@ class CheckingWay(ItemBase):
 
 def validate_xlsx_or_csv(value):
     ext = value.name.split('.')[-1]
-    if ext not in ['xlsx', 'csv']:
-        raise ValidationError('Chỉ chấp nhận tệp có định dạng xlsx hoặc csv.')
+    if ext not in ['pdf']:
+        raise ValidationError('Chỉ chấp nhận tệp có định dạng pdf.')
 
 class Process(ItemBase):
     class Meta:
