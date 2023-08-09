@@ -1,7 +1,7 @@
 from django.contrib import admin
-from .models import ( MaintenanceDevice, Building, BuildingDetail, MaintenanceArea, MaintenanceAreaDetail, MaintenanceDeviceItem, MaintenanceTask, MaintenanceTaskDocument, 
+from .models import ( MaintenanceDevice, MaintenanceArea, MaintenanceAreaDetail, MaintenanceDeviceItem, MaintenanceTask, MaintenanceTaskDocument, 
                      User, Project, Process, CheckingWay, ProcessSection, ProcessStep, DeviceDocument, Device)
-from .resources import BuildingResource, ProjectResource, DeviceResource
+from .resources import  ProjectResource, DeviceResource
 from import_export.admin import ImportExportModelAdmin
 
 admin.site.register(User)
@@ -11,12 +11,12 @@ class ProjectAdmin(ImportExportModelAdmin):
     list_display = ["name", "code", "starting_date", "ending_date"]
     resource_class= ProjectResource
 
-@admin.register(Building)
-class BuildingAdmin(ImportExportModelAdmin):
-    list_display = ["name", "description", "project_id"]
-    resource_class = BuildingResource
+# @admin.register(Building)
+# class BuildingAdmin(ImportExportModelAdmin):
+#     list_display = ["name", "description", "project_id"]
+#     resource_class = BuildingResource
 
-admin.site.register(BuildingDetail)
+# admin.site.register(BuildingDetail)
 admin.site.register(MaintenanceArea)
 admin.site.register(MaintenanceAreaDetail)
 admin.site.register(Process)

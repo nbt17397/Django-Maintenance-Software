@@ -1,10 +1,10 @@
 from rest_framework import viewsets, permissions, status, generics
 from .permissions import ( IsUserManager, IsSuperUser )
 from .serializers import ( ReadDeviceDocumentSerializer, ReadMaintenanceDeviceItemSerializer, ReadMaintenanceTaskDocumentSerializer, WriteDeviceDocumentSerializer, ReadMaintenanceAreaDetailSerializer, ReadMaintenanceDeviceSerializer, ReadMaintenanceTaskSerializer, ReadProcessStepSerializer, WriteMaintenanceAreaDetailSerializer, ReadMaintenanceAreaSerializer, 
-                          WriteMaintenanceAreaSerializer, ReadBuildingDetailSerializer, ReadBuildingSerializer, UserSerializer, ReadProjectSerializer, 
-                          WriteBuildingSerializer, WriteMaintenanceDeviceItemSerializer, WriteMaintenanceDeviceSerializer, WriteMaintenanceTaskDocumentSerializer, WriteMaintenanceTaskSerializer, WriteProcessStepSerializer, WriteProjectSerializer, WriteBuildingDetailSerializer, ProcessSerializer, CheckingWaySerializer, 
+                          WriteMaintenanceAreaSerializer, UserSerializer, ReadProjectSerializer, 
+                           WriteMaintenanceDeviceItemSerializer, WriteMaintenanceDeviceSerializer, WriteMaintenanceTaskDocumentSerializer, WriteMaintenanceTaskSerializer, WriteProcessStepSerializer, WriteProjectSerializer, ProcessSerializer, CheckingWaySerializer, 
                           ReadProcessSectionSerializer, WriteProcessSectionSerializer, ReadDeviceSerializer, WriteDeviceSerializer)
-from .models import ( Building, BuildingDetail, MaintenanceArea, MaintenanceAreaDetail, MaintenanceDevice, MaintenanceDeviceItem, MaintenanceTask, MaintenanceTaskDocument, User, Project, Process, CheckingWay, ProcessSection, ProcessStep, Device, DeviceDocument)
+from .models import ( MaintenanceArea, MaintenanceAreaDetail, MaintenanceDevice, MaintenanceDeviceItem, MaintenanceTask, MaintenanceTaskDocument, User, Project, Process, CheckingWay, ProcessSection, ProcessStep, Device, DeviceDocument)
 from rest_framework.parsers import MultiPartParser
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -113,52 +113,52 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         return ReadProjectSerializer
     
-    @action(methods=['get'], detail=True, url_path='get-building-by-project')
-    def get_building_by_project(self, request, pk):
-        buildings= self.get_object().building_ids.filter(active=True)
+    @action(methods=['get'], detail=True, url_path='get-areas')
+    def get_areas(self, request, pk):
+        areas= self.get_object().area_ids.filter(active=True)
         
-        serializer = ReadBuildingSerializer(buildings, many=True)
-        return Response(data={"buildings": serializer.data}, status=status.HTTP_200_OK)
-    
-    
-    
-
-class BuildingViewSet(viewsets.ModelViewSet):
-    queryset = Building.objects.filter(active=True)
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_permissions(self):
-        if self.action in ('create', 'update', 'partial_update', 'destroy'):
-            permission_classes = [permissions.IsAuthenticated, IsSuperUser]
-        elif self.action == 'list':
-            permission_classes = [permissions.IsAuthenticated, IsUserManager]
-        else:
-            permission_classes = [permissions.AllowAny]
-        return [permission() for permission in permission_classes]
-
-    def get_serializer_class(self):
-        if self.action in ('create', 'update', 'partial_update', 'destroy'):
-            return WriteBuildingSerializer
-
-        return ReadBuildingSerializer
-
-
-class BuildingDetailViewSet(viewsets.ModelViewSet):
-    queryset = BuildingDetail.objects.filter(active=True)
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_serializer_class(self):
-        if self.action in ('create', 'update', 'partial_update', 'destroy'):
-            return WriteBuildingDetailSerializer
-
-        return ReadBuildingDetailSerializer
-    
-    @action(methods=['get'], detail=True, url_path='get-maintenance-area')
-    def get_maintenance_area(self, request, pk):
-        maintenance_area= self.get_object().area_ids.filter(active=True)
-        
-        serializer = ReadMaintenanceAreaSerializer(maintenance_area, many=True)
+        serializer = ReadMaintenanceAreaSerializer(areas, many=True)
         return Response(data={"results": serializer.data}, status=status.HTTP_200_OK)
+    
+    
+    
+
+# class BuildingViewSet(viewsets.ModelViewSet):
+#     queryset = Building.objects.filter(active=True)
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def get_permissions(self):
+#         if self.action in ('create', 'update', 'partial_update', 'destroy'):
+#             permission_classes = [permissions.IsAuthenticated, IsSuperUser]
+#         elif self.action == 'list':
+#             permission_classes = [permissions.IsAuthenticated, IsUserManager]
+#         else:
+#             permission_classes = [permissions.AllowAny]
+#         return [permission() for permission in permission_classes]
+
+#     def get_serializer_class(self):
+#         if self.action in ('create', 'update', 'partial_update', 'destroy'):
+#             return WriteBuildingSerializer
+
+#         return ReadBuildingSerializer
+
+
+# class BuildingDetailViewSet(viewsets.ModelViewSet):
+#     queryset = BuildingDetail.objects.filter(active=True)
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def get_serializer_class(self):
+#         if self.action in ('create', 'update', 'partial_update', 'destroy'):
+#             return WriteBuildingDetailSerializer
+
+#         return ReadBuildingDetailSerializer
+    
+#     @action(methods=['get'], detail=True, url_path='get-maintenance-area')
+#     def get_maintenance_area(self, request, pk):
+#         maintenance_area= self.get_object().area_ids.filter(active=True)
+        
+#         serializer = ReadMaintenanceAreaSerializer(maintenance_area, many=True)
+#         return Response(data={"results": serializer.data}, status=status.HTTP_200_OK)
 
 
 class MaintenanceAreaViewSet(viewsets.ModelViewSet):
@@ -198,8 +198,8 @@ class ProcessViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=True, url_path='get-section-by-process')
     def get_section_by_process(self, request, pk):
         sections= self.get_object().section_ids.filter(active=True)
-
-        serializer = ReadProcessSectionSerializer(sections, many=True)
+        context = {'request': request}
+        serializer = ReadProcessSectionSerializer(sections, context=context, many=True)
         return Response(data={"sections": serializer.data}, status=status.HTTP_200_OK)
     
 

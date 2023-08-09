@@ -1,8 +1,7 @@
-from django.utils.functional import cached_property
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
 
 
 class User(AbstractUser):
@@ -34,10 +33,18 @@ class CheckingWay(ItemBase):
     class Meta:
         unique_together = ('name',)
 
+def validate_xlsx_or_csv(value):
+    ext = value.name.split('.')[-1]
+    if ext not in ['xlsx', 'csv']:
+        raise ValidationError('Chỉ chấp nhận tệp có định dạng xlsx hoặc csv.')
 
 class Process(ItemBase):
     class Meta:
         unique_together = ('name',)
+
+    path = models.FileField(upload_to='documents/process/%Y/%m',validators=[validate_xlsx_or_csv], null=True)
+
+
 
 
 class ProcessSection(ItemBase):
@@ -106,21 +113,21 @@ class Project(ItemBase):
     members = models.ManyToManyField(User, related_name="project_user_rel", blank=True)
     devices = models.ManyToManyField(Device, related_name="project_device_rel", blank=True)
 
-class Building(ItemBase):
+# class Building(ItemBase):
 
-    class Meta:
-        unique_together = ('name',)
+#     class Meta:
+#         unique_together = ('name',)
 
-    description = models.TextField()
-    project = models.ForeignKey(Project, related_name="building_ids",null=False,on_delete=models.CASCADE)
+#     description = models.TextField()
+#     project = models.ForeignKey(Project, related_name="building_ids",null=False,on_delete=models.CASCADE)
 
 
-class BuildingDetail(ItemBase):
-    class Meta:
-        unique_together = ('name',)
+# class BuildingDetail(ItemBase):
+#     class Meta:
+#         unique_together = ('name',)
 
-    description = models.TextField()
-    building = models.ForeignKey(Building, related_name="building_detail_ids", null=False,on_delete=models.CASCADE)
+#     description = models.TextField()
+#     building = models.ForeignKey(Building, related_name="building_detail_ids", null=False,on_delete=models.CASCADE)
 
 
 class MaintenanceArea(ItemBase):
@@ -129,7 +136,7 @@ class MaintenanceArea(ItemBase):
         unique_together = ('name',)
 
     description = models.TextField()
-    building_detail = models.ForeignKey(BuildingDetail, related_name="area_ids",null=False,on_delete=models.CASCADE)
+    building_detail = models.ForeignKey(Project, related_name="area_ids",null=False,on_delete=models.CASCADE)
 
 
 class MaintenanceAreaDetail(ItemBase):

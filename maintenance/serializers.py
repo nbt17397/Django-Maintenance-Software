@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
-from .models import MaintenanceDevice, Building, BuildingDetail, MaintenanceArea, MaintenanceAreaDetail, MaintenanceDeviceItem, MaintenanceTask, MaintenanceTaskDocument, User, Project, Process, CheckingWay, ProcessSection, ProcessStep, DeviceDocument, Device
+from .models import MaintenanceDevice, MaintenanceArea, MaintenanceAreaDetail, MaintenanceDeviceItem, MaintenanceTask, MaintenanceTaskDocument, User, Project, Process, CheckingWay, ProcessSection, ProcessStep, DeviceDocument, Device
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -40,32 +40,32 @@ class UserSerializer(ModelSerializer):
 # Building Detail
 
 
-class ReadBuildingDetailSerializer(ModelSerializer):
-    class Meta:
-        model = BuildingDetail
-        fields = ['id','name','description','building']
+# class ReadBuildingDetailSerializer(ModelSerializer):
+#     class Meta:
+#         model = BuildingDetail
+#         fields = ['id','name','description','building']
 
 
-class WriteBuildingDetailSerializer(ModelSerializer):
-    class Meta:
-        model = BuildingDetail
-        fields = '__all__'
+# class WriteBuildingDetailSerializer(ModelSerializer):
+#     class Meta:
+#         model = BuildingDetail
+#         fields = '__all__'
 
 
 # Building
 
-class ReadBuildingSerializer(ModelSerializer):
+# class ReadBuildingSerializer(ModelSerializer):
 
-    building_detail_ids = ReadBuildingDetailSerializer(many=True)
+#     building_detail_ids = ReadBuildingDetailSerializer(many=True)
 
-    class Meta:
-        model = Building
-        fields =  ['id','name','description','project','building_detail_ids']
+#     class Meta:
+#         model = Building
+#         fields =  ['id','name','description','project','building_detail_ids']
 
-class WriteBuildingSerializer(ModelSerializer):
-    class Meta:
-        model = Building
-        fields = '__all__'
+# class WriteBuildingSerializer(ModelSerializer):
+#     class Meta:
+#         model = Building
+#         fields = '__all__'
 
 
 # Maintenance Area Detail
@@ -97,9 +97,21 @@ class WriteMaintenanceAreaSerializer(ModelSerializer):
 # Process
 
 class ProcessSerializer(ModelSerializer):
+    path = SerializerMethodField()
     class Meta:
         model = Process
         fields = '__all__'
+
+    def get_path(self, process):
+        request = self.context.get('request')
+        if request:
+            filename = process.path.name
+            if filename.startswith("static/"):
+                path = '/%s' % filename
+            else:
+                path = '/static/%s' % filename
+            return request.build_absolute_uri(path)
+        return process.path.name
 
 
 # CheckingWay
@@ -114,9 +126,11 @@ class CheckingWaySerializer(ModelSerializer):
 
 class ReadProcessStepSerializer(ModelSerializer):
     checking_way = CheckingWaySerializer()
+
     class Meta:
         model = ProcessStep
         fields = ['id','name','checking_way','section']
+
 
 
 class WriteProcessStepSerializer(ModelSerializer):
@@ -147,7 +161,7 @@ class ReadDeviceDocumentSerializer(ModelSerializer):
 
     class Meta:
         model = DeviceDocument
-        fields = ['id', 'name', 'path', 'device']
+        fields = ['id', 'name', 'path', 'device', 'active']
 
     def get_path(self, device_document):
         request = self.context.get('request')
@@ -180,24 +194,23 @@ class ReadMaintenanceTaskDocumentSerializer(ModelSerializer):
         fields = ['id', 'name', 'path', 'maintenance_task']
 
 
-    def get_path(self, device_document):
+    def get_path(self, task_document):
         request = self.context.get('request')
         if request:
-            filename = device_document.path.name
+            filename = task_document.path.name
             if filename.startswith("static/"):
                 path = '/%s' % filename
             else:
                 path = '/static/%s' % filename
             return request.build_absolute_uri(path)
-        return device_document.path.name
+        return task_document.path.name
     
 
 class WriteMaintenanceTaskDocumentSerializer(ModelSerializer):
-    path = SerializerMethodField()
     
     class Meta:
         model = MaintenanceTaskDocument
-        fields = ['id', 'name', 'path', 'maintenance_task']
+        fields = '__all__'
 
 # Device 
 
@@ -266,7 +279,7 @@ class ReadMaintenanceTaskSerializer(ModelSerializer):
     maintenance_task_document_ids = ReadMaintenanceTaskDocumentSerializer(many=True)
     class Meta:
         model = MaintenanceTask
-        fields = ["id","name","sequence","maintenance_device_item","is_qualified","note","employee","maintenance_task_document_ids"]
+        fields = ["id","name","sequence","maintenance_device_item","is_qualified","note","employee","maintenance_task_document_ids", 'starting_date', 'ending_date']
 
 class WriteMaintenanceTaskSerializer(ModelSerializer):
     class Meta:
