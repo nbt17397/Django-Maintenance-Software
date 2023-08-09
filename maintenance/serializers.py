@@ -215,7 +215,7 @@ class WriteMaintenanceTaskDocumentSerializer(ModelSerializer):
 # Device 
 
 class ReadDeviceSerializer(ModelSerializer):
-    process = ProcessSerializer()
+    # process = ProcessSerializer()
 
     class Meta:
         model = Device
