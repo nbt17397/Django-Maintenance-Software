@@ -113,6 +113,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         return ReadProjectSerializer
     
+    @action(methods=['get'], detail=True, url_path='get-maintenance-devices')
+    def get_maintenance_device(self, request, pk):
+        project = self.get_object()
+        maintenance_devices = MaintenanceDevice.objects.filter(maintenance_area_detail__maintenance_area__building_detail=project)    
+        serializer = ReadMaintenanceDeviceSerializer(maintenance_devices, many=True)
+        return Response(data={"results": serializer.data}, status=status.HTTP_200_OK)
+    
     @action(methods=['get'], detail=True, url_path='get-areas')
     def get_areas(self, request, pk):
         areas= self.get_object().area_ids.filter(active=True)
