@@ -251,13 +251,22 @@ class WriteDeviceSerializer(ModelSerializer):
 
 class ReadMaintenanceDeviceItemSerializer(ModelSerializer):
     members = ReadUserSerializer(many=True)
-    device_name = serializers.CharField(source="device.name")
+    device_name = serializers.SerializerMethodField()
     # process_id = serializers.IntegerField(source="device.process.id")
     
 
     class Meta:
         model = MaintenanceDeviceItem
         fields = ["id","name","description","starting_date","ending_date","device","device_name","members"]
+
+    def get_device_name(self, obj):
+        device = obj.device
+        if device is not None:
+            # If "device" is not None, return the device's name
+            return device.name
+        else:
+            # If "device" is None, return None or a specific value of your choice
+            return None
 
 
 class WriteMaintenanceDeviceItemSerializer(ModelSerializer):
