@@ -336,6 +336,13 @@ class MaintenanceDeviceViewSet(viewsets.ModelViewSet):
         serializer = ReadMaintenanceDeviceItemSerializer(items, context=context, many=True)
         return Response(data={"results": serializer.data}, status=status.HTTP_200_OK)
     
+    @action(methods=['get'], detail=True, url_path='get-maintenance-device-tasks')
+    def get_maintenance_tasks(self, request, pk):
+        items= self.get_object().maintenance_device_task_ids.filter(active=True)
+        context = {'request': request}
+        serializer = ReadMaintenanceTaskSerializer(items, context=context, many=True)
+        return Response(data={"results": serializer.data}, status=status.HTTP_200_OK)
+    
 
 class MaintenanceDeviceItemViewSet(viewsets.ModelViewSet):
     queryset = MaintenanceDeviceItem.objects.filter(active=True)
@@ -347,9 +354,9 @@ class MaintenanceDeviceItemViewSet(viewsets.ModelViewSet):
 
         return ReadMaintenanceDeviceItemSerializer
     
-    @action(methods=['get'], detail=True, url_path='get-maintenance-tasks')
+    @action(methods=['get'], detail=True, url_path='get-maintenance-device-item-tasks')
     def get_maintenance_tasks(self, request, pk):
-        items= self.get_object().maintenance_task_ids.filter(active=True)
+        items= self.get_object().maintenance_device_item_task_ids.filter(active=True)
         context = {'request': request}
         serializer = ReadMaintenanceTaskSerializer(items, context=context, many=True)
         return Response(data={"results": serializer.data}, status=status.HTTP_200_OK)

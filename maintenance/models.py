@@ -196,7 +196,8 @@ class MaintenanceTask(ItemBase):
 
     
     sequence = models.IntegerField(default=1)
-    maintenance_device_item = models.ForeignKey(MaintenanceDeviceItem, related_name="maintenance_task_ids",null=True,on_delete=models.SET_NULL)
+    maintenance_device_item = models.ForeignKey(MaintenanceDeviceItem, related_name="maintenance_device_item_task_ids",null=True,on_delete=models.SET_NULL)
+    maintenance_device = models.ForeignKey(MaintenanceDevice, related_name="maintenance_device_task_ids",null=True,on_delete=models.SET_NULL)
     is_qualified = models.BooleanField(default=False)
     note = models.TextField(null=True)
     starting_date = models.DateTimeField(null=True)
