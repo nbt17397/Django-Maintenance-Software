@@ -299,7 +299,7 @@ class ReadMaintenanceTaskSerializer(ModelSerializer):
     maintenance_task_document_ids = ReadMaintenanceTaskDocumentSerializer(many=True)
     class Meta:
         model = MaintenanceTask
-        fields = ["id","name","sequence","maintenance_device_item","is_qualified","note","employee","maintenance_task_document_ids", 'starting_date', 'ending_date']
+        fields = ["id","name","sequence","maintenance_device","maintenance_device_item","is_qualified","note","employee","maintenance_task_document_ids", 'starting_date', 'ending_date']
 
 class WriteMaintenanceTaskSerializer(ModelSerializer):
     class Meta:
